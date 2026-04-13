@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart City RSA Communication</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f1117;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* TOP NAV */
+        .navbar {
+            background: #1a1d27;
+            border-bottom: 1px solid #2d3148;
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #60a5fa;
+            letter-spacing: 0.3px;
+        }
+        .navbar .logo span { color: #e2e8f0; }
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* LAYOUT */
+        .main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width { grid-column: 1 / -1; }
+
+        /* STATS ROW */
+        .stats-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .stat-card {
+            background: #1a1d27;
+            border: 1px solid #2d3148;
+            border-radius: 12px;
+            padding: 16px 18px;
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+        .stat-card .value.blue { color: #60a5fa; }
+        .stat-card .value.green { color: #22c55e; }
+        .stat-card .value.amber { color: #f59e0b; }
+        .stat-card .value.purple { color: #a78bfa; }
+
+        /* CARDS */
+        .card {
+            background: #1a1d27;
+            border: 1px solid #2d3148;
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .card-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .card-icon.blue { background: #1e3a5f; }
+        .card-icon.green { background: #14532d; }
+        .card-icon.purple { background: #2e1065; }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        .card-subtitle {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* FORM ELEMENTS */
+        select, input[type="text"] {
+            width: 100%;
+            padding: 11px 14px;
+            background: #0f1117;
+            border: 1px solid #2d3148;
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            margin-bottom: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus, input[type="text"]:focus {
+            border-color: #3b82f6;
+        }
+        select option { background: #1a1d27; }
+
+        /* DEVICE TAGS */
+        .device-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #2d3148;
+            background: #0f1117;
+            color: #94a3b8;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .tag.active, .tag:hover {
+            background: #1e3a5f;
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        /* BUTTONS */
+        .btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+        }
+        .btn-primary:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            margin-top: 10px;
+        }
+        .btn-success:hover { background: linear-gradient(135deg, #15803d, #166534); transform: translateY(-1px); }
+
+        /* STATUS */
+        .status-bar {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            display: none;
+        }
+        .status-bar.success {
+            background: #14532d;
+            color: #86efac;
+            border: 1px solid #166534;
+            display: block;
+        }
+        .status-bar.error {
+            background: #450a0a;
+            color: #fca5a5;
+            border: 1px solid #7f1d1d;
+            display: block;
+        }
+        .status-bar.loading {
+            background: #1e3a5f;
+            color: #93c5fd;
+            border: 1px solid #1e40af;
+            display: block;
+        }
+
+        /* OUTPUT PANEL */
+        .output-section { margin-top: 0; }
+        .output-block {
+            background: #0f1117;
+            border: 1px solid #2d3148;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .output-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+        .output-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+        .output-value.green { color: #22c55e; }
+        .output-value.blue { color: #60a5fa; }
+        .output-value.amber { color: #f59e0b; }
+
+        /* SECURITY BADGES */
+        .security-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .badge.on { background: #14532d; color: #86efac; border: 1px solid #166534; }
+        .badge.off { background: #1e1e1e; color: #64748b; border: 1px solid #2d3148; }
+
+        /* LOGS TABLE */
+        .table-wrap { overflow-x: auto; margin-top: 14px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #0f1117;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #2d3148;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #1a1d27;
+            color: #cbd5e1;
+            vertical-align: middle;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        tr:hover td { background: #1e2235; }
+        .verified-yes {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #14532d;
+            color: #86efac;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .verified-no {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #450a0a;
+            color: #fca5a5;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #475569;
+            font-size: 14px;
+        }
+        .device-pill {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #1e3a5f;
+            color: #60a5fa;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">
+        🏙️ <span>Smart City</span> RSA Framework
+    </div>
+    <div class="nav-status">
+        <div class="dot"></div>
+        System Online
+    </div>
+</nav>
+
+<div class="main">
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="label">Total Messages</div>
+            <div class="value blue" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Verified</div>
+            <div class="value green" id="stat-verified">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">RSA Key (n)</div>
+            <div class="value amber">3233</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Encryption</div>
+            <div class="value purple">RSA-17</div>
+        </div>
+    </div>
+
+    <!-- LEFT: INPUT CARD -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon blue">📡</div>
+            <div>
+                <div class="card-title">IoT Device Simulator</div>
+                <div class="card-subtitle">Select device and send encrypted data</div>
+            </div>
+        </div>
+
+        <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Device Type</div>
+        <div class="device-tags">
+            <div class="tag active" onclick="selectTag(this, 'Traffic Sensor')">🚦 Traffic</div>
+            <div class="tag" onclick="selectTag(this, 'Pollution Monitor')">🌫️ Pollution</div>
+            <div class="tag" onclick="selectTag(this, 'Temperature Sensor')">🌡️ Temperature</div>
+            <div class="tag" onclick="selectTag(this, 'Water Level Sensor')">💧 Water</div>
+        </div>
+
+        <input type="hidden" id="deviceType" value="Traffic Sensor">
+        <input type="text" id="message" placeholder="Enter sensor data e.g. Traffic congestion at Junction A">
+
+        <button class="btn btn-primary" onclick="processRSA()">
+            🔐 Encrypt &amp; Send Secure Data
+        </button>
+
+        <div id="status" class="status-bar"></div>
+
+        <div style="margin-top:20px;">
+            <div style="font-size:12px;color:#64748b;margin-bottom:10px;">Security Properties</div>
+            <div class="security-badges">
+                <span class="badge on">✓ Confidentiality</span>
+                <span class="badge on">✓ Integrity</span>
+                <span class="badge on">✓ Authentication</span>
+                <span class="badge on">✓ Non-repudiation</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: OUTPUT CARD -->
+    <div class="card output-section">
+        <div class="card-header">
+            <div class="card-icon purple">🔑</div>
+            <div>
+                <div class="card-title">RSA Output</div>
+                <div class="card-subtitle">Encryption, decryption &amp; signature</div>
+            </div>
+        </div>
+
+        <div id="output-area">
+            <div class="empty-state">
+                Send data to see RSA output here
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM: LOGS CARD -->
+    <div class="card full-width">
+        <div class="card-header">
+            <div class="card-icon green">🗄️</div>
+            <div>
+                <div class="card-title">Communication Logs</div>
+                <div class="card-subtitle">Stored in PostgreSQL database</div>
+            </div>
+        </div>
+
+        <button class="btn btn-success" onclick="loadLogs()">
+            📋 Refresh Logs from Database
+        </button>
+
+        <div id="logs-container">
+            <div class="empty-state">Click "Refresh Logs" to load data from PostgreSQL</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let selectedDevice = 'Traffic Sensor';
+
+function selectTag(el, device) {
+    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    selectedDevice = device;
+    document.getElementById('deviceType').value = device;
+}
+
+function modPow(base, exp, mod) {
+    let result = 1n;
+    base = base % mod;
+    while (exp > 0n) {
+        if (exp % 2n === 1n) result = (result * base) % mod;
+        exp = exp / 2n;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+async function processRSA() {
+    let msg = document.getElementById("message").value.trim();
+    let statusEl = document.getElementById("status");
+
+    if (!msg) { alert("Please enter sensor data!"); return; }
+
+    let n = 3233n, e = 17n, d = 2753n;
+    let encryptedArr = [], decryptedText = "";
+
+    for (let i = 0; i < msg.length; i++) {
+        let ascii = BigInt(msg.charCodeAt(i));
+        let enc = modPow(ascii, e, n);
+        encryptedArr.push(enc.toString());
+        decryptedText += String.fromCharCode(Number(modPow(enc, d, n)));
+    }
+
+    let firstChar = BigInt(msg.charCodeAt(0));
+    let signature = modPow(firstChar, d, n);
+    let isValid = modPow(signature, e, n) === firstChar;
+
+    document.getElementById("output-area").innerHTML = `
+        <div class="output-block">
+            <div class="output-label">Original Message</div>
+            <div class="output-value green">${msg}</div>
+        </div>
+        <div class="output-block">
+            <div class="output-label">Encrypted (ASCII → C = M^e mod n)</div>
+            <div class="output-value blue">${encryptedArr.join(', ')}</div>
+        </div>
+        <div class="output-block">
+            <div class="output-label">Decrypted (M = C^d mod n)</div>
+            <div class="output-value green">${decryptedText}</div>
+        </div>
+        <div class="output-block">
+            <div class="output-label">Digital Signature (S = M^d mod n)</div>
+            <div class="output-value amber">${signature.toString()}</div>
+        </div>
+        <div class="output-block">
+            <div class="output-label">Signature Verified (S^e mod n = M?)</div>
+            <div class="output-value ${isValid ? 'green' : 'red'}">${isValid ? '✅ TRUE — Authentic' : '❌ FALSE — Invalid'}</div>
+        </div>
+    `;
+
+    try {
+        statusEl.className = "status-bar loading";
+        statusEl.textContent = "⏳ Saving to PostgreSQL...";
+
+        let res = await fetch('http://localhost:3000/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                original_message: "[" + selectedDevice + "] " + msg,
+                encrypted_data: encryptedArr.join(", "),
+                signature: signature.toString(),
+                verified: isValid
+            })
+        });
+
+        let result = await res.json();
+        if (result.success) {
+            statusEl.className = "status-bar success";
+            statusEl.textContent = "✅ Saved! SHA-256: " + result.hash_value.substring(0, 24) + "...";
+            loadLogs();
+        } else throw new Error(result.error);
+    } catch (err) {
+        statusEl.className = "status-bar error";
+        statusEl.textContent = "❌ DB Error: " + err.message;
+    }
+}
+
+async function loadLogs() {
+    let container = document.getElementById("logs-container");
+    try {
+        let res = await fetch('http://localhost:3000/logs');
+        let logs = await res.json();
+
+        document.getElementById("stat-total").textContent = logs.length;
+        document.getElementById("stat-verified").textContent = logs.filter(l => l.verified).length;
+
+        if (!logs.length) {
+            container.innerHTML = '<div class="empty-state">No logs yet. Send some data first!</div>';
+            return;
+        }
+
+        let html = `<div class="table-wrap"><table>
+            <thead><tr>
+                <th>#</th><th>Device</th><th>Message</th>
+                <th>Encrypted (preview)</th><th>Hash (preview)</th>
+                <th>Verified</th><th>Time</th>
+            </tr></thead><tbody>`;
+
+        logs.forEach(log => {
+            let parts = log.original_message.match(/^\[(.+?)\]\s(.+)$/);
+            let device = parts ? parts[1] : '';
+            let msgText = parts ? parts[2] : log.original_message;
+            let time = new Date(log.created_at).toLocaleTimeString();
+            html += `<tr>
+                <td style="color:#64748b">${log.id}</td>
+                <td><span class="device-pill">${device}</span></td>
+                <td style="max-width:140px">${msgText}</td>
+                <td style="font-family:monospace;color:#60a5fa">${log.encrypted_data.substring(0,22)}…</td>
+                <td style="font-family:monospace;color:#a78bfa">${log.hash_value.substring(0,14)}…</td>
+                <td><span class="${log.verified ? 'verified-yes' : 'verified-no'}">${log.verified ? '✅ Yes' : '❌ No'}</span></td>
+                <td style="color:#64748b">${time}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    } catch (err) {
+        container.innerHTML = `<div class="empty-state" style="color:#fca5a5">❌ Cannot connect to server: ${err.message}</div>`;
+    }
+}
+
+loadLogs();
+</script>
+</body>
+</html>
