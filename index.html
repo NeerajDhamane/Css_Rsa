@@ -1,577 +1,633 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Smart City RSA Communication</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Smart City Secure System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: rgba(23, 28, 40, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --glass-blur: blur(12px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #0f1117;
-            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 0;
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
         }
 
-        /* TOP NAV */
-        .navbar {
-            background: #1a1d27;
-            border-bottom: 1px solid #2d3148;
-            padding: 14px 32px;
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 2rem;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 14, 20, 0.8);
+            backdrop-filter: var(--glass-blur);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .navbar .logo {
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 17px;
-            font-weight: 700;
-            color: #60a5fa;
-            letter-spacing: 0.3px;
+            gap: 0.75rem;
         }
-        .navbar .logo span { color: #e2e8f0; }
-        .nav-status {
+
+        .logo i { color: var(--accent-blue); }
+        .logo span { color: var(--accent-blue); }
+
+        nav { display: flex; gap: 1.5rem; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #94a3b8;
+            gap: 0.5rem;
         }
-        .dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #22c55e;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+        nav a:hover, nav a.active { color: var(--text-primary); }
+        nav a.active { color: var(--accent-blue); }
 
-        /* LAYOUT */
-        .main {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 32px 20px;
+        /* --- Layout --- */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
         }
 
-        .full-width { grid-column: 1 / -1; }
+        @media (max-width: 1024px) {
+            main { grid-template-columns: 1fr; }
+        }
 
-        /* STATS ROW */
-        .stats-row {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-        }
-        .stat-card {
-            background: #1a1d27;
-            border: 1px solid #2d3148;
-            border-radius: 12px;
-            padding: 16px 18px;
-        }
-        .stat-card .label {
-            font-size: 12px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
-        }
-        .stat-card .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #e2e8f0;
-        }
-        .stat-card .value.blue { color: #60a5fa; }
-        .stat-card .value.green { color: #22c55e; }
-        .stat-card .value.amber { color: #f59e0b; }
-        .stat-card .value.purple { color: #a78bfa; }
-
-        /* CARDS */
+        /* --- Cards --- */
         .card {
-            background: #1a1d27;
-            border: 1px solid #2d3148;
-            border-radius: 16px;
-            padding: 24px;
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .card-icon {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .card-icon.blue { background: #1e3a5f; }
-        .card-icon.green { background: #14532d; }
-        .card-icon.purple { background: #2e1065; }
-        .card-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-        .card-subtitle {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 2px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            backdrop-filter: var(--glass-blur);
+            overflow: hidden;
+            margin-bottom: 2rem;
         }
 
-        /* FORM ELEMENTS */
-        select, input[type="text"] {
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body { padding: 1.5rem; }
+
+        /* --- Form Elements --- */
+        .field { margin-bottom: 1.5rem; }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .device-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .device-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .device-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .device-btn.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .device-btn i {
+            display: block;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea, input {
             width: 100%;
-            padding: 11px 14px;
-            background: #0f1117;
-            border: 1px solid #2d3148;
-            border-radius: 10px;
-            color: #e2e8f0;
-            font-size: 14px;
-            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-family: inherit;
             outline: none;
             transition: border-color 0.2s;
         }
-        select:focus, input[type="text"]:focus {
-            border-color: #3b82f6;
-        }
-        select option { background: #1a1d27; }
 
-        /* DEVICE TAGS */
-        .device-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 14px;
-        }
-        .tag {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid #2d3148;
-            background: #0f1117;
-            color: #94a3b8;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        .tag.active, .tag:hover {
-            background: #1e3a5f;
-            border-color: #3b82f6;
-            color: #60a5fa;
-        }
+        textarea:focus, input:focus { border-color: var(--accent-blue); }
 
-        /* BUTTONS */
-        .btn {
+        .btn-primary {
             width: 100%;
-            padding: 13px;
+            background: var(--accent-blue);
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 15px;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-primary:hover { background: #2563eb; }
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* --- Attack Panel --- */
+        .attack-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .attack-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-        }
-        .btn-primary:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(0); }
-        .btn-success {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-            color: white;
-            margin-top: 10px;
-        }
-        .btn-success:hover { background: linear-gradient(135deg, #15803d, #166534); transform: translateY(-1px); }
 
-        /* STATUS */
-        .status-bar {
-            margin-top: 12px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
+        .attack-btn:hover { background: rgba(239, 68, 68, 0.2); }
+        .attack-btn.active { background: var(--accent-red); color: white; }
+
+        /* --- Educational Mode --- */
+        .edu-mode {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px dashed var(--accent-purple);
+            border-radius: 0.75rem;
+        }
+
+        .edu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .step {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.3);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        /* --- Animations --- */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            display: inline-block;
+            margin-right: 0.5rem;
+            box-shadow: 0 0 10px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        #statusMsg {
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
             display: none;
         }
-        .status-bar.success {
-            background: #14532d;
-            color: #86efac;
-            border: 1px solid #166534;
-            display: block;
-        }
-        .status-bar.error {
-            background: #450a0a;
-            color: #fca5a5;
-            border: 1px solid #7f1d1d;
-            display: block;
-        }
-        .status-bar.loading {
-            background: #1e3a5f;
-            color: #93c5fd;
-            border: 1px solid #1e40af;
-            display: block;
-        }
 
-        /* OUTPUT PANEL */
-        .output-section { margin-top: 0; }
-        .output-block {
-            background: #0f1117;
-            border: 1px solid #2d3148;
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-        .output-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-            margin-bottom: 6px;
-        }
-        .output-value {
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #e2e8f0;
-            word-break: break-all;
-            line-height: 1.6;
-        }
-        .output-value.green { color: #22c55e; }
-        .output-value.blue { color: #60a5fa; }
-        .output-value.amber { color: #f59e0b; }
+        .success { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .error { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
 
-        /* SECURITY BADGES */
-        .security-badges {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 4px;
-        }
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .badge.on { background: #14532d; color: #86efac; border: 1px solid #166534; }
-        .badge.off { background: #1e1e1e; color: #64748b; border: 1px solid #2d3148; }
-
-        /* LOGS TABLE */
-        .table-wrap { overflow-x: auto; margin-top: 14px; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        th {
-            background: #0f1117;
-            color: #64748b;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #2d3148;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #1a1d27;
-            color: #cbd5e1;
-            vertical-align: middle;
-            max-width: 160px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        tr:hover td { background: #1e2235; }
-        .verified-yes {
-            display: inline-block;
-            padding: 3px 10px;
-            background: #14532d;
-            color: #86efac;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .verified-no {
-            display: inline-block;
-            padding: 3px 10px;
-            background: #450a0a;
-            color: #fca5a5;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #475569;
-            font-size: 14px;
-        }
-        .device-pill {
-            display: inline-block;
-            padding: 3px 8px;
-            background: #1e3a5f;
-            color: #60a5fa;
-            border-radius: 6px;
-            font-size: 11px;
-            margin-right: 6px;
-        }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="logo">
-        🏙️ <span>Smart City</span> RSA Framework
-    </div>
-    <div class="nav-status">
-        <div class="dot"></div>
-        System Online
-    </div>
-</nav>
+    <header>
+        <div class="logo">
+            <i class="fas fa-shield-halved"></i>
+            SECURE-CITY <span>COMM</span>
+        </div>
+        <nav>
+            <a href="/" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="/verify.html"><i class="fas fa-list-check"></i> System Logs</a>
+        </nav>
+    </header>
 
-<div class="main">
+    <main>
+        <!-- LEFT: Primary Action -->
+        <section>
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-satellite-dish"></i> IoT Message Composer</h2>
+                    <span id="sessionStatus"><span class="status-dot"></span> System Ready</span>
+                </div>
+                <div class="card-body">
+                    <div class="field">
+                        <label>1. Select IoT Device</label>
+                        <div class="device-selector" id="deviceList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
 
-    <!-- STATS ROW -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="label">Total Messages</div>
-            <div class="value blue" id="stat-total">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">Verified</div>
-            <div class="value green" id="stat-verified">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">RSA Key (n)</div>
-            <div class="value amber">3233</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">Encryption</div>
-            <div class="value purple">RSA-17</div>
-        </div>
-    </div>
+                    <div class="field">
+                        <label>2. Secure Payload</label>
+                        <textarea id="messageInput" placeholder="Enter message from IoT device (e.g., Traffic Flow: 85%)" rows="3"></textarea>
+                    </div>
 
-    <!-- LEFT: INPUT CARD -->
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon blue">📡</div>
-            <div>
-                <div class="card-title">IoT Device Simulator</div>
-                <div class="card-subtitle">Select device and send encrypted data</div>
+                    <div class="field">
+                        <label>3. Shared Secret (HMAC)</label>
+                        <input type="text" id="sharedSecret" value="smart_city_v2_secret">
+                    </div>
+
+                    <button class="btn-primary" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i> Sign, Encrypt & Transmit
+                    </button>
+
+                    <div id="statusMsg"></div>
+                </div>
             </div>
-        </div>
 
-        <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Device Type</div>
-        <div class="device-tags">
-            <div class="tag active" onclick="selectTag(this, 'Traffic Sensor')">🚦 Traffic</div>
-            <div class="tag" onclick="selectTag(this, 'Pollution Monitor')">🌫️ Pollution</div>
-            <div class="tag" onclick="selectTag(this, 'Temperature Sensor')">🌡️ Temperature</div>
-            <div class="tag" onclick="selectTag(this, 'Water Level Sensor')">💧 Water</div>
-        </div>
-
-        <input type="hidden" id="deviceType" value="Traffic Sensor">
-        <input type="text" id="message" placeholder="Enter sensor data e.g. Traffic congestion at Junction A">
-
-        <button class="btn btn-primary" onclick="processRSA()">
-            🔐 Encrypt &amp; Send Secure Data
-        </button>
-
-        <div id="status" class="status-bar"></div>
-
-        <div style="margin-top:20px;">
-            <div style="font-size:12px;color:#64748b;margin-bottom:10px;">Security Properties</div>
-            <div class="security-badges">
-                <span class="badge on">✓ Confidentiality</span>
-                <span class="badge on">✓ Integrity</span>
-                <span class="badge on">✓ Authentication</span>
-                <span class="badge on">✓ Non-repudiation</span>
+            <!-- Educational Steps View -->
+            <div class="card" id="eduCard" style="display:none;">
+                <div class="card-header">
+                    <h2><i class="fas fa-book-open"></i> Cryptographic Pipeline</h2>
+                </div>
+                <div class="card-body">
+                    <div id="stepsList"></div>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- RIGHT: OUTPUT CARD -->
-    <div class="card output-section">
-        <div class="card-header">
-            <div class="card-icon purple">🔑</div>
-            <div>
-                <div class="card-title">RSA Output</div>
-                <div class="card-subtitle">Encryption, decryption &amp; signature</div>
+        <!-- RIGHT: Attack & System Status -->
+        <aside>
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bug"></i> Attack Simulation</h2>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Intentionally sabotage the security protocol to test server-side and client-side verification.
+                    </p>
+                    <div class="attack-grid">
+                        <button class="attack-btn" onclick="toggleAttack(this, 'tamper')">
+                            <i class="fas fa-edit"></i> Tamper with Data (Integrity)
+                        </button>
+                        <button class="attack-btn" onclick="toggleAttack(this, 'replay')">
+                            <i class="fas fa-rotate-right"></i> Replay Attack (Duplicate)
+                        </button>
+                        <button class="attack-btn" onclick="toggleAttack(this, 'spoof')">
+                            <i class="fas fa-user-secret"></i> Spoof Device (Authentication)
+                        </button>
+                        <button class="attack-btn" onclick="toggleAttack(this, 'expire')">
+                            <i class="fas fa-clock"></i> Old Timestamp (Staleness)
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div id="output-area">
-            <div class="empty-state">
-                Send data to see RSA output here
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-key"></i> Device Key Pairs</h2>
+                </div>
+                <div class="card-body">
+                    <div id="keyInfo" style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">
+                        Select a device to view generated cryptographic keys.
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </aside>
+    </main>
 
-    <!-- BOTTOM: LOGS CARD -->
-    <div class="card full-width">
-        <div class="card-header">
-            <div class="card-icon green">🗄️</div>
-            <div>
-                <div class="card-title">Communication Logs</div>
-                <div class="card-subtitle">Stored in PostgreSQL database</div>
-            </div>
-        </div>
+    <script src="/public/js/crypto-utils.js"></script>
+    <script>
+        let devices = [];
+        let selectedDeviceId = null;
+        let activeAttacks = {
+            tamper: false,
+            replay: false,
+            spoof: false,
+            expire: false
+        };
 
-        <button class="btn btn-success" onclick="loadLogs()">
-            📋 Refresh Logs from Database
-        </button>
-
-        <div id="logs-container">
-            <div class="empty-state">Click "Refresh Logs" to load data from PostgreSQL</div>
-        </div>
-    </div>
-
-</div>
-
-<script>
-let selectedDevice = 'Traffic Sensor';
-
-function selectTag(el, device) {
-    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    selectedDevice = device;
-    document.getElementById('deviceType').value = device;
-}
-
-function modPow(base, exp, mod) {
-    let result = 1n;
-    base = base % mod;
-    while (exp > 0n) {
-        if (exp % 2n === 1n) result = (result * base) % mod;
-        exp = exp / 2n;
-        base = (base * base) % mod;
-    }
-    return result;
-}
-
-async function processRSA() {
-    let msg = document.getElementById("message").value.trim();
-    let statusEl = document.getElementById("status");
-
-    if (!msg) { alert("Please enter sensor data!"); return; }
-
-    let n = 3233n, e = 17n, d = 2753n;
-    let encryptedArr = [], decryptedText = "";
-
-    for (let i = 0; i < msg.length; i++) {
-        let ascii = BigInt(msg.charCodeAt(i));
-        let enc = modPow(ascii, e, n);
-        encryptedArr.push(enc.toString());
-        decryptedText += String.fromCharCode(Number(modPow(enc, d, n)));
-    }
-
-    let firstChar = BigInt(msg.charCodeAt(0));
-    let signature = modPow(firstChar, d, n);
-    let isValid = modPow(signature, e, n) === firstChar;
-
-    document.getElementById("output-area").innerHTML = `
-        <div class="output-block">
-            <div class="output-label">Original Message</div>
-            <div class="output-value green">${msg}</div>
-        </div>
-        <div class="output-block">
-            <div class="output-label">Encrypted (ASCII → C = M^e mod n)</div>
-            <div class="output-value blue">${encryptedArr.join(', ')}</div>
-        </div>
-        <div class="output-block">
-            <div class="output-label">Decrypted (M = C^d mod n)</div>
-            <div class="output-value green">${decryptedText}</div>
-        </div>
-        <div class="output-block">
-            <div class="output-label">Digital Signature (S = M^d mod n)</div>
-            <div class="output-value amber">${signature.toString()}</div>
-        </div>
-        <div class="output-block">
-            <div class="output-label">Signature Verified (S^e mod n = M?)</div>
-            <div class="output-value ${isValid ? 'green' : 'red'}">${isValid ? '✅ TRUE — Authentic' : '❌ FALSE — Invalid'}</div>
-        </div>
-    `;
-
-    try {
-        statusEl.className = "status-bar loading";
-        statusEl.textContent = "⏳ Saving to PostgreSQL...";
-
-        let res = await fetch('http://localhost:3000/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                original_message: "[" + selectedDevice + "] " + msg,
-                encrypted_data: encryptedArr.join(", "),
-                signature: signature.toString(),
-                verified: isValid
-            })
+        // Initialize Page
+        window.addEventListener('load', async () => {
+            await fetchDevices();
         });
 
-        let result = await res.json();
-        if (result.success) {
-            statusEl.className = "status-bar success";
-            statusEl.textContent = "✅ Saved! SHA-256: " + result.hash_value.substring(0, 24) + "...";
-            loadLogs();
-        } else throw new Error(result.error);
-    } catch (err) {
-        statusEl.className = "status-bar error";
-        statusEl.textContent = "❌ DB Error: " + err.message;
-    }
-}
-
-async function loadLogs() {
-    let container = document.getElementById("logs-container");
-    try {
-        let res = await fetch('http://localhost:3000/logs');
-        let logs = await res.json();
-
-        document.getElementById("stat-total").textContent = logs.length;
-        document.getElementById("stat-verified").textContent = logs.filter(l => l.verified).length;
-
-        if (!logs.length) {
-            container.innerHTML = '<div class="empty-state">No logs yet. Send some data first!</div>';
-            return;
+        async function fetchDevices() {
+            try {
+                const res = await fetch('/api/devices');
+                devices = await res.json();
+                renderDevices();
+            } catch (err) {
+                console.error('Failed to fetch devices', err);
+            }
         }
 
-        let html = `<div class="table-wrap"><table>
-            <thead><tr>
-                <th>#</th><th>Device</th><th>Message</th>
-                <th>Encrypted (preview)</th><th>Hash (preview)</th>
-                <th>Verified</th><th>Time</th>
-            </tr></thead><tbody>`;
+        function renderDevices() {
+            const list = document.getElementById('deviceList');
+            list.innerHTML = '';
+            devices.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = 'device-btn';
+                btn.innerHTML = `
+                    <i class="fas ${getIcon(d.type)}"></i>
+                    <strong>${d.name}</strong>
+                    <small style="display:block;opacity:0.6">${d.id}</small>
+                `;
+                btn.onclick = () => selectDevice(d.id);
+                list.appendChild(btn);
+            });
+        }
 
-        logs.forEach(log => {
-            let parts = log.original_message.match(/^\[(.+?)\]\s(.+)$/);
-            let device = parts ? parts[1] : '';
-            let msgText = parts ? parts[2] : log.original_message;
-            let time = new Date(log.created_at).toLocaleTimeString();
-            html += `<tr>
-                <td style="color:#64748b">${log.id}</td>
-                <td><span class="device-pill">${device}</span></td>
-                <td style="max-width:140px">${msgText}</td>
-                <td style="font-family:monospace;color:#60a5fa">${log.encrypted_data.substring(0,22)}…</td>
-                <td style="font-family:monospace;color:#a78bfa">${log.hash_value.substring(0,14)}…</td>
-                <td><span class="${log.verified ? 'verified-yes' : 'verified-no'}">${log.verified ? '✅ Yes' : '❌ No'}</span></td>
-                <td style="color:#64748b">${time}</td>
-            </tr>`;
-        });
+        function getIcon(type) {
+            switch(type) {
+                case 'TRAFFIC': return 'fa-traffic-light';
+                case 'POLLUTION': return 'fa-smog';
+                case 'ENVIRONMENT': return 'fa-cloud-sun';
+                default: return 'fa-microchip';
+            }
+        }
 
-        html += '</tbody></table></div>';
-        container.innerHTML = html;
-    } catch (err) {
-        container.innerHTML = `<div class="empty-state" style="color:#fca5a5">❌ Cannot connect to server: ${err.message}</div>`;
-    }
-}
+        async function selectDevice(id) {
+            selectedDeviceId = id;
+            document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+            // Find the button and add active class
+            const btns = document.querySelectorAll('.device-btn');
+            btns.forEach(btn => {
+                if (btn.querySelector('small').textContent === id) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show key info
+            const device = devices.find(d => d.id === id);
+            
+            // Ensure public_key_jwk is an object and has the new bundle format
+            if (typeof device.public_key_jwk === 'string' && device.public_key_jwk.startsWith('{')) {
+                device.public_key_jwk = JSON.parse(device.public_key_jwk);
+            }
 
-loadLogs();
-</script>
+            const keyDisplay = document.getElementById('keyInfo');
+            
+            // Force re-generation if key is missing, in the old format, or private key is lost
+            const privBundleStr = localStorage.getItem(`priv_${device.id}`);
+            const isNewFormat = device.public_key_jwk && device.public_key_jwk.enc && device.public_key_jwk.sig;
+            
+            if (!isNewFormat || !privBundleStr) {
+                keyDisplay.innerHTML = "Syncing/Upgrading security keys...";
+                await setupKeyForDevice(device);
+            }
+
+            keyDisplay.innerHTML = `
+                <span style="color:var(--accent-purple)">RSA PUBLIC KEY BUNDLE (Active):</span><br>
+                <small>Encryption Key: ${device.public_key_jwk.enc.n.substring(0, 30)}...</small><br>
+                <small>Signing Key: ${device.public_key_jwk.sig.n.substring(0, 30)}...</small>
+            `;
+        }
+
+        async function setupKeyForDevice(device) {
+            // 1. Generate Encryption Key Pair (RSA-OAEP)
+            const encKeyPair = await CryptoUtils.generateRSAKeyPair();
+            // 2. Generate Signing Key Pair (RSA-PSS)
+            const signKeyPair = await CryptoUtils.generateSigningKeyPair();
+            
+            const pubBundle = {
+                enc: await CryptoUtils.exportKey(encKeyPair.publicKey),
+                sig: await CryptoUtils.exportKey(signKeyPair.publicKey)
+            };
+            
+            // Persist to server
+            await fetch('/api/update-keys', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    device_id: device.id,
+                    public_key_jwk: pubBundle
+                })
+            });
+            
+            device.public_key_jwk = pubBundle;
+
+            // Store private keys in session storage (simulation only!)
+            const privBundle = {
+                enc: await CryptoUtils.exportKey(encKeyPair.privateKey),
+                sig: await CryptoUtils.exportKey(signKeyPair.privateKey)
+            };
+            localStorage.setItem(`priv_${device.id}`, JSON.stringify(privBundle));
+        }
+
+        function toggleAttack(btn, type) {
+            activeAttacks[type] = !activeAttacks[type];
+            btn.classList.toggle('active', activeAttacks[type]);
+        }
+
+        // --- MOCK REPLAY DATA ---
+        let lastSuccessPayload = null;
+
+        document.getElementById('sendBtn').onclick = async () => {
+            if (!selectedDeviceId) return alert("Please select a device!");
+            const msg = document.getElementById('messageInput').value.trim();
+            if (!msg) return alert("Please enter a message!");
+
+            const status = document.getElementById('statusMsg');
+            const stepsList = document.getElementById('stepsList');
+            const eduCard = document.getElementById('eduCard');
+            
+            status.style.display = 'block';
+            status.className = '';
+            status.textContent = 'Preparing secure transmission...';
+            stepsList.innerHTML = '';
+            eduCard.style.display = 'block';
+
+            try {
+                const device = devices.find(d => d.id === selectedDeviceId);
+
+                // Robustness: ensure it's parsed (though selectDevice should have handled it)
+                if (typeof device.public_key_jwk === 'string') {
+                    device.public_key_jwk = JSON.parse(device.public_key_jwk);
+                }
+                
+                // 1. Import Encryption Public Key from the bundle
+                const pubKeyEnc = await CryptoUtils.importKey(
+                    device.public_key_jwk.enc, 
+                    {name: "RSA-OAEP", hash: "SHA-256"}, 
+                    ["wrapKey"]
+                );
+                
+                // Educational mode logging
+                addStep("Step 1: Generated 256-bit AES symmetric key.");
+                
+                // Hybrid Encryption
+                let hybrid = await CryptoUtils.encryptHybrid(msg, pubKeyEnc);
+                addStep("Step 2: Payload encrypted with AES. AES key wrapped with RSA-OAEP Public Key.");
+
+                // Integrity & Authentication
+                const hash = await CryptoUtils.computeHash(msg);
+                const hmac = await CryptoUtils.computeHMAC(msg, document.getElementById('sharedSecret').value);
+                addStep("Step 3: Computed SHA-256 integrity hash & HMAC authentication tag.");
+
+                // Signing (requires private signing key)
+                const privBundleStr = localStorage.getItem(`priv_${device.id}`);
+                if (!privBundleStr) {
+                    throw new Error("Private keys not found. Please re-select the device to restore/re-generate them.");
+                }
+
+                const privBundle = JSON.parse(privBundleStr);
+                const privKeySig = await CryptoUtils.importKey(
+                    privBundle.sig, 
+                    {name: "RSA-PSS", hash: "SHA-256"}, 
+                    ["sign"]
+                );
+                const signature = await CryptoUtils.signMessage(msg, privKeySig);
+                addStep("Step 4: Message signed with RSA-PSS private key for Non-repudiation.");
+
+                // Replay protection
+                let timestamp = Date.now();
+                let nonce = crypto.randomUUID();
+
+                // --- APPLY SIMULATED ATTACKS ---
+                let payload = {
+                    device_id: selectedDeviceId,
+                    encrypted_message: hybrid.encryptedMessage,
+                    encrypted_key: hybrid.encryptedKey,
+                    iv: hybrid.iv,
+                    hash: hash,
+                    hmac: hmac,
+                    signature: signature,
+                    timestamp: timestamp,
+                    nonce: nonce
+                };
+
+                if (activeAttacks.tamper) {
+                    payload.encrypted_message += "XYZ"; // Corrupt payload
+                    addStep("<span style='color:var(--accent-red)'>ATTACK: Tampering with Encrypted Data</span>");
+                }
+                if (activeAttacks.expire) {
+                    payload.timestamp -= (10 * 60 * 1000); // 10 minutes ago
+                    addStep("<span style='color:var(--accent-red)'>ATTACK: Injecting stale timestamp (10m old)</span>");
+                }
+                if (activeAttacks.spoof) {
+                    payload.device_id = "UNKNOWN_DEVICE_666";
+                    addStep("<span style='color:var(--accent-red)'>ATTACK: Spoofing device identity</span>");
+                }
+                if (activeAttacks.replay && lastSuccessPayload) {
+                    payload = lastSuccessPayload; // Use exactly the same data as before
+                    addStep("<span style='color:var(--accent-red)'>ATTACK: Replaying previous valid payload</span>");
+                }
+
+                // Send to server
+                const res = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                if (res.ok) {
+                    status.className = 'success';
+                    status.textContent = "✅ " + result.message;
+                    lastSuccessPayload = payload; // Cache for replay simulation
+                } else {
+                    status.className = 'error';
+                    status.textContent = "❌ " + (result.message || result.error);
+                }
+
+            } catch (err) {
+                console.error(err);
+                status.className = 'error';
+                status.textContent = "Error: " + err.message;
+            }
+        };
+
+        function addStep(text) {
+            const div = document.createElement('div');
+            div.className = 'step';
+            div.innerHTML = text;
+            document.getElementById('stepsList').appendChild(div);
+        }
+    </script>
 </body>
 </html>
