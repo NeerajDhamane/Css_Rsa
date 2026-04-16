@@ -171,7 +171,8 @@
 
                 <div class="log-section" id="decryptSection" style="display:none;">
                     <span class="log-label">Confidentiality Decryption (Hybrid RSA + AES)</span>
-                    <div id="decryptedOutput"></div>
+                    <div class="log-value" id="decryptedOutput" style="border: 2px solid var(--accent-green); background: rgba(16, 185, 129, 0.05); color: var(--text-primary); font-size: 1.1rem; font-weight: 600;"></div>
+                    <div id="decryptInfo" style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;"></div>
                 </div>
 
                 <div class="log-section">
@@ -272,6 +273,10 @@
                     // Let's assume for this demo we verify a known "test" component or the decrypted msg.
                     
                     const privBundleStr = localStorage.getItem(`priv_${log.device_id}`);
+                    const decryptSection = document.getElementById('decryptSection');
+                    const decryptedOutput = document.getElementById('decryptedOutput');
+                    const decryptInfo = document.getElementById('decryptInfo');
+
                     if (privBundleStr) {
                         const privBundle = JSON.parse(privBundleStr);
                         const privKeyEnc = await CryptoUtils.importKey(privBundle.enc, {name: "RSA-OAEP", hash: "SHA-256"}, ["decrypt", "unwrapKey"]);
@@ -282,12 +287,15 @@
                         sigMessage = isSignatureValid ? "RSA-PSS Signature verified successfully." : "RSA-PSS Signature INVALID! (Non-repudiation failure)";
 
                         decryptSection.style.display = 'block';
-                        output.innerHTML = `
-                            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-green); margin-bottom:0.5rem">${decrypted}</div>
-                            <p style="font-size:0.75rem; opacity:0.7">// Decrypted using device private key.</p>
-                        `;
+                        decryptedOutput.textContent = decrypted;
+                        decryptInfo.innerHTML = `<i class="fas fa-key"></i> Decrypted using device private key stored in local session.`;
                     } else {
-                        sigMessage = "Private key not found in session; cannot decrypt to verify signature.";
+                        sigMessage = "Private key not found in session; cannot verify signature against plaintext.";
+                        decryptSection.style.display = 'block';
+                        decryptedOutput.style.borderColor = 'var(--accent-red)';
+                        decryptedOutput.style.color = 'var(--accent-red)';
+                        decryptedOutput.textContent = "[PRIVATE KEY MISSING]";
+                        decryptInfo.innerHTML = `<i class="fas fa-circle-exclamation"></i> Only the Device that sent this message can decrypt it. Private key was not found in this browser.`;
                     }
                 }
             } catch (err) {
