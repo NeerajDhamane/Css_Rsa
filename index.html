@@ -21,11 +21,7 @@
             --glass-blur: blur(12px);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -38,7 +34,6 @@
                 radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
         }
 
-        /* --- Header --- */
         header {
             padding: 1.5rem 2rem;
             display: flex;
@@ -52,33 +47,15 @@
             z-index: 100;
         }
 
-        .logo {
-            font-weight: 800;
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
+        .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.75rem; }
         .logo i { color: var(--accent-blue); }
         .logo span { color: var(--accent-blue); }
 
         nav { display: flex; gap: 1.5rem; }
-        nav a {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        nav a { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem; }
         nav a:hover, nav a.active { color: var(--text-primary); }
         nav a.active { color: var(--accent-blue); }
 
-        /* --- Layout --- */
         main {
             max-width: 1200px;
             margin: 2rem auto;
@@ -88,198 +65,48 @@
             gap: 2rem;
         }
 
-        @media (max-width: 1024px) {
-            main { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 1024px) { main { grid-template-columns: 1fr; } }
 
-        /* --- Cards --- */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            backdrop-filter: var(--glass-blur);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .card-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-header h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1rem; backdrop-filter: var(--glass-blur); overflow: hidden; margin-bottom: 2rem; }
+        .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
         .card-body { padding: 1.5rem; }
 
-        /* --- Form Elements --- */
         .field { margin-bottom: 1.5rem; }
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .device-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-        }
+        .device-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
 
-        .device-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-        }
+        .device-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; text-align: left; }
+        .device-btn:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); }
+        .device-btn.active { background: rgba(59, 130, 246, 0.1); border-color: var(--accent-blue); color: var(--text-primary); }
+        .device-btn i { display: block; font-size: 1.25rem; margin-bottom: 0.5rem; }
 
-        .device-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .device-btn.active {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--accent-blue);
-            color: var(--text-primary);
-        }
-
-        .device-btn i {
-            display: block;
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        textarea, input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            color: var(--text-primary);
-            padding: 0.75rem 1rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
+        textarea, input { width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 0.75rem; color: var(--text-primary); padding: 0.75rem 1rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
         textarea:focus, input:focus { border-color: var(--accent-blue); }
 
-        .btn-primary {
-            width: 100%;
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
+        .btn-primary { width: 100%; background: var(--accent-blue); color: white; border: none; border-radius: 0.75rem; padding: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.1s, background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.75rem; }
         .btn-primary:hover { background: #2563eb; }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* --- Attack Panel --- */
-        .attack-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
-        .attack-btn {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: var(--accent-red);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
+        .attack-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+        .attack-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--accent-red); padding: 0.75rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
         .attack-btn:hover { background: rgba(239, 68, 68, 0.2); }
         .attack-btn.active { background: var(--accent-red); color: white; }
 
-        /* --- Educational Mode --- */
-        .edu-mode {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: rgba(139, 92, 246, 0.05);
-            border: 1px dashed var(--accent-purple);
-            border-radius: 0.75rem;
-        }
+        .step { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-secondary); background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-purple); }
 
-        .edu-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .step {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            background: rgba(0,0,0,0.3);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-left: 3px solid var(--accent-purple);
-        }
-
-        /* --- Animations --- */
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.05); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-green);
-            display: inline-block;
-            margin-right: 0.5rem;
-            box-shadow: 0 0 10px var(--accent-green);
-            animation: pulse 2s infinite;
-        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); display: inline-block; margin-right: 0.5rem; box-shadow: 0 0 10px var(--accent-green); animation: pulse 2s infinite; }
 
-        #statusMsg {
-            font-size: 0.8rem;
-            margin-top: 1rem;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            display: none;
-        }
-
+        #statusMsg { font-size: 0.8rem; margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; display: none; }
         .success { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
         .error { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
-
     </style>
 </head>
 <body>
@@ -296,7 +123,6 @@
     </header>
 
     <main>
-        <!-- LEFT: Primary Action -->
         <section>
             <div class="card">
                 <div class="card-header">
@@ -306,9 +132,7 @@
                 <div class="card-body">
                     <div class="field">
                         <label>1. Select IoT Device</label>
-                        <div class="device-selector" id="deviceList">
-                            <!-- Populated by JS -->
-                        </div>
+                        <div class="device-selector" id="deviceList"></div>
                     </div>
 
                     <div class="field">
@@ -329,7 +153,6 @@
                 </div>
             </div>
 
-            <!-- Educational Steps View -->
             <div class="card" id="eduCard" style="display:none;">
                 <div class="card-header">
                     <h2><i class="fas fa-book-open"></i> Cryptographic Pipeline</h2>
@@ -340,7 +163,6 @@
             </div>
         </section>
 
-        <!-- RIGHT: Attack & System Status -->
         <aside>
             <div class="card">
                 <div class="card-header">
@@ -384,14 +206,9 @@
     <script>
         let devices = [];
         let selectedDeviceId = null;
-        let activeAttacks = {
-            tamper: false,
-            replay: false,
-            spoof: false,
-            expire: false
-        };
+        let activeAttacks = { tamper: false, replay: false, spoof: false, expire: false };
+        let lastSuccessPayload = null;
 
-        // Initialize Page
         window.addEventListener('load', async () => {
             await fetchDevices();
         });
@@ -434,30 +251,29 @@
         async function selectDevice(id) {
             selectedDeviceId = id;
             document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
-            // Find the button and add active class
-            const btns = document.querySelectorAll('.device-btn');
-            btns.forEach(btn => {
-                if (btn.querySelector('small').textContent === id) {
-                    btn.classList.add('active');
-                }
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                if (btn.querySelector('small').textContent === id) btn.classList.add('active');
             });
-            
-            // Show key info
+
             const device = devices.find(d => d.id === id);
-            
-            // Ensure public_key_jwk is an object and has the new bundle format
+
             if (typeof device.public_key_jwk === 'string' && device.public_key_jwk.startsWith('{')) {
                 device.public_key_jwk = JSON.parse(device.public_key_jwk);
             }
 
             const keyDisplay = document.getElementById('keyInfo');
-            
-            // Force re-generation if key is missing, in the old format, or private key is lost
             const privBundleStr = localStorage.getItem(`priv_${device.id}`);
             const isNewFormat = device.public_key_jwk && device.public_key_jwk.enc && device.public_key_jwk.sig;
-            
-            if (!isNewFormat || !privBundleStr) {
+
+            // FIX: Only regenerate keys if BOTH the server key AND local private key are missing.
+            // Previously using || caused key regeneration even when a private key existed,
+            // which created a mismatch between the new public key and old signed logs.
+            if (!isNewFormat && !privBundleStr) {
                 keyDisplay.innerHTML = "Syncing/Upgrading security keys...";
+                await setupKeyForDevice(device);
+            } else if (!privBundleStr) {
+                // Server has new format key but local private key is gone — must regenerate
+                keyDisplay.innerHTML = "Regenerating lost private key...";
                 await setupKeyForDevice(device);
             }
 
@@ -469,29 +285,22 @@
         }
 
         async function setupKeyForDevice(device) {
-            // 1. Generate Encryption Key Pair (RSA-OAEP)
             const encKeyPair = await CryptoUtils.generateRSAKeyPair();
-            // 2. Generate Signing Key Pair (RSA-PSS)
             const signKeyPair = await CryptoUtils.generateSigningKeyPair();
-            
+
             const pubBundle = {
                 enc: await CryptoUtils.exportKey(encKeyPair.publicKey),
                 sig: await CryptoUtils.exportKey(signKeyPair.publicKey)
             };
-            
-            // Persist to server
+
             await fetch('/api/update-keys', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    device_id: device.id,
-                    public_key_jwk: pubBundle
-                })
+                body: JSON.stringify({ device_id: device.id, public_key_jwk: pubBundle })
             });
-            
+
             device.public_key_jwk = pubBundle;
 
-            // Store private keys in session storage (simulation only!)
             const privBundle = {
                 enc: await CryptoUtils.exportKey(encKeyPair.privateKey),
                 sig: await CryptoUtils.exportKey(signKeyPair.privateKey)
@@ -504,9 +313,6 @@
             btn.classList.toggle('active', activeAttacks[type]);
         }
 
-        // --- MOCK REPLAY DATA ---
-        let lastSuccessPayload = null;
-
         document.getElementById('sendBtn').onclick = async () => {
             if (!selectedDeviceId) return alert("Please select a device!");
             const msg = document.getElementById('messageInput').value.trim();
@@ -515,7 +321,7 @@
             const status = document.getElementById('statusMsg');
             const stepsList = document.getElementById('stepsList');
             const eduCard = document.getElementById('eduCard');
-            
+
             status.style.display = 'block';
             status.className = '';
             status.textContent = 'Preparing secure transmission...';
@@ -525,31 +331,26 @@
             try {
                 const device = devices.find(d => d.id === selectedDeviceId);
 
-                // Robustness: ensure it's parsed (though selectDevice should have handled it)
                 if (typeof device.public_key_jwk === 'string') {
                     device.public_key_jwk = JSON.parse(device.public_key_jwk);
                 }
-                
-                // 1. Import Encryption Public Key from the bundle
+
                 const pubKeyEnc = await CryptoUtils.importKey(
-                    device.public_key_jwk.enc, 
-                    {name: "RSA-OAEP", hash: "SHA-256"}, 
+                    device.public_key_jwk.enc,
+                    {name: "RSA-OAEP", hash: "SHA-256"},
                     ["wrapKey"]
                 );
-                
-                // Educational mode logging
+
                 addStep("Step 1: Generated 256-bit AES symmetric key.");
-                
-                // Hybrid Encryption
+
                 let hybrid = await CryptoUtils.encryptHybrid(msg, pubKeyEnc);
                 addStep("Step 2: Payload encrypted with AES. AES key wrapped with RSA-OAEP Public Key.");
 
-                // Integrity & Authentication
+                // Compute hash of the plaintext message
                 const hash = await CryptoUtils.computeHash(msg);
                 const hmac = await CryptoUtils.computeHMAC(msg, document.getElementById('sharedSecret').value);
                 addStep("Step 3: Computed SHA-256 integrity hash & HMAC authentication tag.");
 
-                // Signing (requires private signing key)
                 const privBundleStr = localStorage.getItem(`priv_${device.id}`);
                 if (!privBundleStr) {
                     throw new Error("Private keys not found. Please re-select the device to restore/re-generate them.");
@@ -557,18 +358,19 @@
 
                 const privBundle = JSON.parse(privBundleStr);
                 const privKeySig = await CryptoUtils.importKey(
-                    privBundle.sig, 
-                    {name: "RSA-PSS", hash: "SHA-256"}, 
+                    privBundle.sig,
+                    {name: "RSA-PSS", hash: "SHA-256"},
                     ["sign"]
                 );
-                const signature = await CryptoUtils.signMessage(msg, privKeySig);
-                addStep("Step 4: Message signed with RSA-PSS private key for Non-repudiation.");
 
-                // Replay protection
+                // FIX: signMessage now signs the raw bytes of the hash hex,
+                // not the UTF-8 encoding of the hex string.
+                const signature = await CryptoUtils.signMessage(hash, privKeySig);
+                addStep("Step 4: Message hash signed with RSA-PSS private key (raw digest bytes) for Non-repudiation.");
+
                 let timestamp = Date.now();
                 let nonce = crypto.randomUUID();
 
-                // --- APPLY SIMULATED ATTACKS ---
                 let payload = {
                     device_id: selectedDeviceId,
                     encrypted_message: hybrid.encryptedMessage,
@@ -582,11 +384,11 @@
                 };
 
                 if (activeAttacks.tamper) {
-                    payload.encrypted_message += "XYZ"; // Corrupt payload
+                    payload.encrypted_message += "XYZ";
                     addStep("<span style='color:var(--accent-red)'>ATTACK: Tampering with Encrypted Data</span>");
                 }
                 if (activeAttacks.expire) {
-                    payload.timestamp -= (10 * 60 * 1000); // 10 minutes ago
+                    payload.timestamp -= (10 * 60 * 1000);
                     addStep("<span style='color:var(--accent-red)'>ATTACK: Injecting stale timestamp (10m old)</span>");
                 }
                 if (activeAttacks.spoof) {
@@ -594,11 +396,10 @@
                     addStep("<span style='color:var(--accent-red)'>ATTACK: Spoofing device identity</span>");
                 }
                 if (activeAttacks.replay && lastSuccessPayload) {
-                    payload = lastSuccessPayload; // Use exactly the same data as before
+                    payload = lastSuccessPayload;
                     addStep("<span style='color:var(--accent-red)'>ATTACK: Replaying previous valid payload</span>");
                 }
 
-                // Send to server
                 const res = await fetch('/api/save', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -609,7 +410,7 @@
                 if (res.ok) {
                     status.className = 'success';
                     status.textContent = "✅ " + result.message;
-                    lastSuccessPayload = payload; // Cache for replay simulation
+                    lastSuccessPayload = payload;
                 } else {
                     status.className = 'error';
                     status.textContent = "❌ " + (result.message || result.error);

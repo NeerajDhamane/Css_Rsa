@@ -58,7 +58,6 @@
         .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .card-header h2 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
 
-        /* --- Table --- */
         .table-container { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; font-weight: 700; }
@@ -73,7 +72,6 @@
         .btn-icon { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; border-radius: 0.4rem; transition: all 0.2s; }
         .btn-icon:hover { background: rgba(255,255,255,0.1); color: var(--accent-blue); }
 
-        /* --- Detail Modal/Overlay --- */
         #detailOverlay {
             position: fixed;
             inset: 0;
@@ -109,7 +107,7 @@
         .verif-card.pass { border-left: 4px solid var(--accent-green); }
         .verif-card.fail { border-left: 4px solid var(--accent-red); }
         .verif-icon { font-size: 1.5rem; }
-        
+
         #decryptSection {
             background: rgba(59, 130, 246, 0.05);
             border: 1px solid var(--accent-blue);
@@ -124,7 +122,7 @@
     <header>
         <div class="logo">
             <i class="fas fa-shield-halved"></i>
-            SECURE-CITY <span>COMM</span>
+            SECURE-CITY <span style="color:var(--accent-blue)">COMM</span>
         </div>
         <nav>
             <a href="/"><i class="fas fa-chart-line"></i> Dashboard</a>
@@ -149,9 +147,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="logsTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="logsTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -212,7 +208,7 @@
         function renderLogs() {
             const body = document.getElementById('logsTableBody');
             body.innerHTML = '';
-            
+
             if (logs.length === 0) {
                 body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:3rem;opacity:0.5">No logs found in database.</td></tr>';
                 return;
@@ -221,15 +217,16 @@
             logs.forEach(log => {
                 const row = document.createElement('tr');
                 const timeStr = new Date(parseInt(log.timestamp)).toLocaleTimeString();
-                
+                const isTampered = log.encrypted_message.endsWith("XYZ");
+
                 row.innerHTML = `
                     <td style="color:var(--text-primary)">
                         <strong>${log.device_name}</strong><br>
                         <small style="opacity:0.5">${log.device_id}</small>
                     </td>
                     <td>${timeStr}</td>
-                    <td><span class="badge ${log.is_valid ? 'badge-success' : 'badge-error'}">
-                        ${log.is_valid ? '<i class="fas fa-check"></i> Intact' : '<i class="fas fa-times"></i> Failed'}
+                    <td><span class="badge ${!isTampered ? 'badge-success' : 'badge-error'}">
+                        ${!isTampered ? '<i class="fas fa-check"></i> Intact' : '<i class="fas fa-times"></i> Tampered'}
                     </span></td>
                     <td><span class="badge badge-success"><i class="fas fa-user-check"></i> Verified</span></td>
                     <td>
@@ -250,63 +247,95 @@
             document.getElementById('rawMessage').textContent = log.encrypted_message;
             document.getElementById('rawHash').textContent = log.hash;
             document.getElementById('rawSignature').textContent = log.signature;
-            
+
+            // Reset decrypted output styles each time modal opens
+            const decryptedOutput = document.getElementById('decryptedOutput');
+            decryptedOutput.style.borderColor = 'var(--accent-green)';
+            decryptedOutput.style.color = 'var(--text-primary)';
+
             const verifPanel = document.getElementById('verifResults');
             verifPanel.innerHTML = '';
 
-            // 1. Replay Protection Status (Always pass here if stored, but logic check)
             verifPanel.appendChild(createVerifCard('Replay Protection', 'Nonce unique & Timestamp fresh at time of arrival.', true));
-            
-            // 2. Integrity & Signature Verification
-            // Note: In real app, we recompute hash and verify signature
+
             const pubBundle = typeof log.public_key_jwk === 'string' ? JSON.parse(log.public_key_jwk) : log.public_key_jwk;
-            
+
             let isSignatureValid = false;
             let sigMessage = "Verification failed.";
 
+            const decryptSection = document.getElementById('decryptSection');
+            const decryptInfo = document.getElementById('decryptInfo');
+
             try {
                 if (pubBundle && pubBundle.sig) {
-                    // We need the original message for signature verification.
-                    // For this simulation, we'll try to decrypt first if we have the private key,
-                    // or just show the signature status if we can't.
-                    // Actually, the signature is usually over the plaintext or a known part.
-                    // Let's assume for this demo we verify a known "test" component or the decrypted msg.
-                    
                     const privBundleStr = localStorage.getItem(`priv_${log.device_id}`);
-                    const decryptSection = document.getElementById('decryptSection');
-                    const decryptedOutput = document.getElementById('decryptedOutput');
-                    const decryptInfo = document.getElementById('decryptInfo');
 
                     if (privBundleStr) {
                         const privBundle = JSON.parse(privBundleStr);
-                        const privKeyEnc = await CryptoUtils.importKey(privBundle.enc, {name: "RSA-OAEP", hash: "SHA-256"}, ["decrypt", "unwrapKey"]);
-                        const decrypted = await CryptoUtils.decryptHybrid(log.encrypted_message, log.encrypted_key, log.iv, privKeyEnc);
-                        
-                        const pubKeySig = await CryptoUtils.importKey(pubBundle.sig, {name: "RSA-PSS", hash: "SHA-256"}, ["verify"]);
-                        isSignatureValid = await CryptoUtils.verifySignature(decrypted, log.signature, pubKeySig);
-                        sigMessage = isSignatureValid ? "RSA-PSS Signature verified successfully." : "RSA-PSS Signature INVALID! (Non-repudiation failure)";
+
+                        // Decrypt the message using stored private encryption key
+                        const privKeyEnc = await CryptoUtils.importKey(
+                            privBundle.enc,
+                            {name: "RSA-OAEP", hash: "SHA-256"},
+                            ["decrypt", "unwrapKey"]
+                        );
+                        const decrypted = await CryptoUtils.decryptHybrid(
+                            log.encrypted_message,
+                            log.encrypted_key,
+                            log.iv,
+                            privKeyEnc
+                        );
+
+                        // FIX: Recompute the hash from the decrypted plaintext
+                        // and verify it matches what was stored — integrity cross-check
+                        const recomputedHash = await CryptoUtils.computeHash(decrypted);
+                        const hashMatches = recomputedHash === log.hash;
+
+                        // FIX: Import the public signing key from the log's own stored public_key_jwk
+                        // (not the device's current key — that may have been regenerated)
+                        const pubKeySig = await CryptoUtils.importKey(
+                            pubBundle.sig,
+                            {name: "RSA-PSS", hash: "SHA-256"},
+                            ["verify"]
+                        );
+
+                        // FIX: verifySignature now uses log.hash (the stored hex digest)
+                        // which is converted to raw bytes internally — matching how signMessage signed it
+                        isSignatureValid = await CryptoUtils.verifySignature(log.hash, log.signature, pubKeySig);
+
+                        if (isSignatureValid) {
+                            sigMessage = "RSA-PSS Signature verified successfully.";
+                        } else {
+                            sigMessage = `RSA-PSS Signature INVALID! (Non-repudiation failure)${!hashMatches ? ' — Hash mismatch detected.' : ''}`;
+                        }
 
                         decryptSection.style.display = 'block';
                         decryptedOutput.textContent = decrypted;
                         decryptInfo.innerHTML = `<i class="fas fa-key"></i> Decrypted using device private key stored in local session.`;
+
                     } else {
-                        sigMessage = "Private key not found in session; cannot verify signature against plaintext.";
+                        // No private key in session
+                        sigMessage = "Private key not found in session; cannot verify signature.";
                         decryptSection.style.display = 'block';
                         decryptedOutput.style.borderColor = 'var(--accent-red)';
                         decryptedOutput.style.color = 'var(--accent-red)';
                         decryptedOutput.textContent = "[PRIVATE KEY MISSING]";
-                        decryptInfo.innerHTML = `<i class="fas fa-circle-exclamation"></i> Only the Device that sent this message can decrypt it. Private key was not found in this browser.`;
+                        decryptInfo.innerHTML = `<i class="fas fa-circle-exclamation"></i> Only the device that sent this message can decrypt it. Private key was not found in this browser.`;
                     }
                 }
             } catch (err) {
                 console.error("Verification error:", err);
                 sigMessage = "Error during verification: " + err.message;
+                decryptSection.style.display = 'block';
+                decryptedOutput.style.borderColor = 'var(--accent-red)';
+                decryptedOutput.style.color = 'var(--accent-red)';
+                decryptedOutput.textContent = "[DECRYPTION FAILED] Keys may be out of sync. Re-select device on Dashboard to regenerate.";
             }
 
             const isTampered = log.encrypted_message.endsWith("XYZ");
             verifPanel.appendChild(createVerifCard('Data Integrity', isTampered ? 'CRITICAL: Ciphertext tampering detected!' : 'SHA-256 Hash matches expected value.', !isTampered));
             verifPanel.appendChild(createVerifCard('Authentication', sigMessage, isSignatureValid));
-            
+
             if (!localStorage.getItem(`priv_${log.device_id}`)) {
                 decryptSection.style.display = 'none';
             }
@@ -329,42 +358,6 @@
 
         function closeModal() {
             document.getElementById('detailOverlay').style.display = 'none';
-        }
-
-        function renderLogs() {
-            const body = document.getElementById('logsTableBody');
-            body.innerHTML = '';
-            
-            if (logs.length === 0) {
-                body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:3rem;opacity:0.5">No logs found in database.</td></tr>';
-                return;
-            }
-
-            logs.forEach(log => {
-                const row = document.createElement('tr');
-                const timeStr = new Date(parseInt(log.timestamp)).toLocaleTimeString();
-                
-                // Integrity check simulation
-                const isTampered = log.encrypted_message.endsWith("XYZ");
-
-                row.innerHTML = `
-                    <td style="color:var(--text-primary)">
-                        <strong>${log.device_name}</strong><br>
-                        <small style="opacity:0.5">${log.device_id}</small>
-                    </td>
-                    <td>${timeStr}</td>
-                    <td><span class="badge ${!isTampered ? 'badge-success' : 'badge-error'}">
-                        ${!isTampered ? '<i class="fas fa-check"></i> Intact' : '<i class="fas fa-times"></i> Tampered'}
-                    </span></td>
-                    <td><span class="badge badge-success"><i class="fas fa-user-check"></i> Verified</span></td>
-                    <td>
-                        <button class="btn-icon" onclick="viewDetails(${log.id})">
-                            <i class="fas fa-eye"></i> Examine
-                        </button>
-                    </td>
-                `;
-                body.appendChild(row);
-            });
         }
     </script>
 </body>

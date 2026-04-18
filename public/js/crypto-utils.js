@@ -123,30 +123,33 @@ const CryptoUtils = {
 
     /**
      * Digital Signature (Non-repudiation)
+     * Signs the raw bytes of the SHA-256 hex digest (not the UTF-8 encoded hex string)
+     * This ensures consistent signing regardless of string encoding.
      */
-    async signMessage(message, privateKey) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(message);
+    async signMessage(hashHex, privateKey) {
+        // Convert hex string to raw bytes — sign the actual digest bytes
+        const bytes = new Uint8Array(hashHex.match(/.{2}/g).map(b => parseInt(b, 16)));
         const signature = await window.crypto.subtle.sign(
             { name: "RSA-PSS", saltLength: 32 },
             privateKey,
-            data
+            bytes
         );
         return this.bufToBase64(signature);
     },
 
     /**
      * Verify Digital Signature
+     * Verifies against raw bytes of the SHA-256 hex digest — must match signMessage exactly.
      */
-    async verifySignature(message, signatureBase64, publicKey) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(message);
+    async verifySignature(hashHex, signatureBase64, publicKey) {
+        // Same conversion as signMessage — verify against raw hash bytes
+        const bytes = new Uint8Array(hashHex.match(/.{2}/g).map(b => parseInt(b, 16)));
         const signature = this.base64ToBuf(signatureBase64);
         return await window.crypto.subtle.verify(
             { name: "RSA-PSS", saltLength: 32 },
             publicKey,
             signature,
-            data
+            bytes
         );
     },
 
